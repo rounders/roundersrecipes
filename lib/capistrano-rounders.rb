@@ -1,11 +1,5 @@
 
-
 Capistrano::Configuration.instance(:must_exist).load do
-
-  require 'capistrano/recipes/deploy/scm'
-  require 'capistrano/recipes/deploy/strategy'
-
-
   def _cset(name, *args, &block)
     unless exists?(name)
       set(name, *args, &block)
