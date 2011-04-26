@@ -15,11 +15,12 @@ Capistrano::Configuration.instance(:must_exist).load do
   set(:url)     { "#{application}.roundersdev.com" }
   _cset(:runner)        { user }
   _cset :use_sudo,      false
-  _cset :nginx_config_path, "/opt/local/nginx/conf/sites-available"
+  set :nginx_config_path, "/opt/local/nginx/conf/sites-available"
 
   # SCM settings
-  _cset(:deploy_to)        { "/home/virtual/#{application}" }
-  _cset :scm,           'git'
+
+  # set(:deploy_to), defer { "/home/virtual/#{application}" }
+  set :scm,           'git'
   set(:repository)      { "git@github.com:rounders/#{application}.git"}
   _cset :branch,        'master'
   _cset :deploy_via,    'remote_cache'
@@ -38,6 +39,11 @@ Capistrano::Configuration.instance(:must_exist).load do
   #
 
   namespace :deploy do
+    
+    desc "eat shit"
+    task :eat_shit, :roles => :app do
+    end
+    
     task :start do ; end
     task :stop do ; end
     task :restart, :roles => :app, :except => { :no_release => true } do
@@ -89,7 +95,7 @@ EOF
       encoding: utf8
       database: #{application}
       username: root
-      password: 44bdbac
+      password: xxxxxx
 EOF
 
       page = ERB.new(template).result(binding) 
