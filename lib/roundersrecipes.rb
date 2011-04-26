@@ -19,7 +19,7 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   # SCM settings
 
-  # set(:deploy_to), defer { "/home/virtual/#{application}" }
+  set(:deploy_to)      { "/home/virtual/#{application}" }
   set :scm,           'git'
   set(:repository)      { "git@github.com:rounders/#{application}.git"}
   _cset :branch,        'master'
@@ -29,6 +29,19 @@ Capistrano::Configuration.instance(:must_exist).load do
   # Git settings for capistrano
   default_run_options[:pty]     = true # needed for git password prompts
   ssh_options[:forward_agent]   = true # use the keys for the person running the cap command to check out the app
+
+  if roles[:web].servers.count == 0 
+    role :web, "linode2.ronincommunications.com"                          # Your HTTP server, Apache/etc
+  end
+  
+  if roles[:app].servers.count == 0
+    role :app, "linode2.ronincommunications.com"                          # This may be the same as your `Web` server
+  end
+  
+  if roles[:db].servers.count == 0
+    role :db,  "linode2.ronincommunications.com", :primary => true # This is where Rails migrations will run
+  end
+  
 
   #
   # Runtime Configuration, Recipes & Callbacks
@@ -40,8 +53,25 @@ Capistrano::Configuration.instance(:must_exist).load do
 
   namespace :deploy do
     
-    desc "eat shit"
-    task :eat_shit, :roles => :app do
+    desc "show configuration settings"
+    task :config, :roles    => :app do
+      vars                  = {
+        'Application'       => application,
+        'Repository'        => repository,
+        'Nginx Config Path' => nginx_config_path,
+        'URL'               => url,
+        'Deploy User'       => user,
+        'web'               => roles[:web].servers.first.host,
+        'app'               => roles[:app].servers.first.host,
+        'db'                => roles[:db].servers.first.host,
+        'use_sudo'          => use_sudo.to_s,
+        'deploy_to'         => deploy_to,
+        'Deploy Group'      => group,
+        'scm'               => scm,
+        'branch'            => branch
+
+      }
+      display_vars(vars)
     end
     
     task :start do ; end
@@ -58,52 +88,33 @@ Capistrano::Configuration.instance(:must_exist).load do
 
     desc "write out nginx virtual host configuration for this app"
     task :write_nginx_config, :roles => :web do
-      template =<<EOF
-      server {
-        listen       80;
-        server_name  #{url};
-        #charset koi8-r;
-        #access_log  logs/host.access.log  main;
-        location / {
-          root   #{current_path}/public;
-          index  index.html index.htm;
-          passenger_enabled on;
-        }
-        #error_page  404              /404.html;
-        # redirect server error pages to the static page /50x.html
-        #
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-          root   html;
-        }
-
-      }
-EOF
-
+      template_path = File.expand_path('../../templates/nginx.erb', __FILE__)
+      template = open(template_path) { |f| f.read }
       page = ERB.new(template).result(binding)
+      
       put page, "#{shared_path}/#{url}", :mode => 0644
       sudo "cp #{shared_path}/#{url} #{nginx_config_path}"
       sudo "cd #{nginx_config_path}/../sites-enabled;ln -s ../sites-available/#{url}"
       sudo "/etc/init.d/nginx restart"
     end
+    
+    task :mysql, :roles => :web do
+      template_path = File.expand_path('../../templates/database_yml.erb', __FILE__)
+      template = open(template_path) { |f| f.read }
+      page = ERB.new(template).result(binding)
+
+      puts page
+    end
 
     desc "write database.yml file"
     task :write_database_yaml, :roles => :web do
-      template =<<EOF      
-      production:
-      adapter: mysql2
-      encoding: utf8
-      database: #{application}
-      username: root
-      password: xxxxxx
-EOF
-
-      page = ERB.new(template).result(binding) 
+      template_path = File.expand_path('../../templates/database_yml.erb', __FILE__)
+      template = open(template_path) { |f| f.read }
+      page = ERB.new(template).result(binding)
       put page, "#{release_path}/config/database.yml", :mode => 0644
     end
 
-    desc "monkey"
-
+    desc "rake db:create"
     task :dbcreate, :roles => :db, :only => { :primary => true } do
       rake = fetch(:rake, "rake")
       rails_env = fetch(:rails_env, "production")
@@ -132,6 +143,19 @@ EOF
 
   end
 
+end
+
+
+def display_vars(vars, options={})
+  max_length = vars.map { |v| v[0].to_s.size }.max
+  vars.keys.sort.each do |key|
+    if options[:shell]
+      puts "#{key}=#{vars[key]}"
+    else
+      spaces = ' ' * (max_length - key.to_s.size)
+      puts "#{' ' * (options[:indent] || 0)}#{key}#{spaces} => #{format(vars[key], options)}"
+    end
+  end
 end
 
 
