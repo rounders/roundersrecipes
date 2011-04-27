@@ -3,5 +3,5 @@ production:
   encoding: utf8
   database: <%= application %>
   username: <%= Capistrano::CLI.ui.ask("Enter MySQL database username: ") %>
-  password: <%= Capistrano::CLI.ui.ask("Enter MySQL database password: ") %>
+  password: <%= Capistrano::CLI.password_prompt("Enter MySQL database password: ") %>
 
