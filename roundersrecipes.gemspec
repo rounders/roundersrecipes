@@ -5,17 +5,20 @@
 
 Gem::Specification.new do |s|
   s.name = %q{roundersrecipes}
-  s.version = "0.0.4"
+  s.version = "0.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Francois Harbec"]
-  s.date = %q{2011-03-29}
+  s.date = %q{2011-06-16}
   s.description = %q{Rounders recipes for Capistrano}
   s.email = %q{fharbec@gmail.com}
   s.files = [
     "Rakefile",
     "VERSION",
-    "lib/roundersrecipes.rb"
+    "lib/roundersrecipes/linode2.rb",
+    "roundersrecipes.gemspec",
+    "templates/database_yml.erb",
+    "templates/nginx.erb"
   ]
   s.homepage = %q{http://github.com/rounders/roundersrecipes}
   s.require_paths = ["lib"]
