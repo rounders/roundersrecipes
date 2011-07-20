@@ -1,0 +1,51 @@
+= roundersrecipes
+                 
+Capistrano recipes to make it easier for me to deploy to one of my linode servers. 
+
+
+== Installation
+
+Open up your Gemfile and add at the bottom this line:
+	
+	group :development do
+  		gem "roundersrecipes", :git => "git@github.com:rounders/roundersrecipes.git", :require => false
+	end
+
+Now, run:
+
+    $ bundle install
+
+== Usage
+
+Start by capifying your project as follows
+
+    $ capify .
+
+Then edit config/deploy.rb and make it look as follows:
+
+	require "bundler/capistrano"
+
+	set :application, "your_application_name"
+
+	require 'roundersrecipes/linode2'
+
+Now you can run the various deploy recipes:
+
+	$ bundle exec cap deploy:setup
+	$ bundle exec cap deploy:cold
+	$ bundle exec cap deploy
+	
+If you want to deploy from the local git repository, add the following lines after the require 'roundersrecipes/linode2' line:
+
+	set :repository, File.expand_path("../../.git", __FILE__)
+	set :deploy_via, :copy
+
+== License
+
+Please see MIT-LICENSE for more details.
+
+== Copyright
+
+Copyright (c) 2011 Rounders Consulting Inc.
+
+
