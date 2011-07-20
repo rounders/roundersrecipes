@@ -1,6 +1,6 @@
 = roundersrecipes
                  
-Capistrano recipes to make it easier for me to deploy to one of my linode servers.  
+Capistrano recipes to make it easier for me to deploy to one of my linode servers.  By default it assumes the project can be found in my github account. 
 
 
 == Installation
