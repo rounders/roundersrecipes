@@ -29,9 +29,9 @@ Then edit config/deploy.rb and make it look as follows:
 
 Now you can run the various deploy recipes:
 
-	$ bundle exec cap deploy:setup
-	$ bundle exec cap deploy:cold
-	$ bundle exec cap deploy
+    $ bundle exec cap deploy:setup
+    $ bundle exec cap deploy:cold
+    $ bundle exec cap deploy
 	
 If you want to deploy from the local git repository, add the following lines after the require 'roundersrecipes/linode2' line:
 
