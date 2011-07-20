@@ -21,12 +21,11 @@ Start by capifying your project as follows
     $ capify .
 
 Then edit config/deploy.rb and make it look as follows:
+ require "bundler/capistrano"
 
-	require "bundler/capistrano"
+ set :application, "your_application_name"
 
-	set :application, "your_application_name"
-
-	require 'roundersrecipes/linode2'
+ require 'roundersrecipes/linode2'
 
 Now you can run the various deploy recipes:
 
@@ -36,8 +35,8 @@ Now you can run the various deploy recipes:
 	
 If you want to deploy from the local git repository, add the following lines after the require 'roundersrecipes/linode2' line:
 
-	set :repository, File.expand_path("../../.git", __FILE__)
-	set :deploy_via, :copy
+ set :repository, File.expand_path("../../.git", __FILE__)
+ set :deploy_via, :copy
 
 == License
 
