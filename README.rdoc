@@ -1,15 +1,14 @@
 = roundersrecipes
                  
-Capistrano recipes to make it easier for me to deploy to one of my linode servers. 
+Capistrano recipes to make it easier for me to deploy to one of my linode servers.  
 
 
 == Installation
 
 Open up your Gemfile and add at the bottom this line:
-	
-	group :development do
-  		gem "roundersrecipes", :git => "git@github.com:rounders/roundersrecipes.git", :require => false
-	end
+ group :development do
+    gem "roundersrecipes", :git => "git@github.com:rounders/roundersrecipes.git", :require => false
+ end
 
 Now, run:
 
