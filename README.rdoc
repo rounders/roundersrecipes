@@ -37,7 +37,23 @@ If you want to deploy from the local git repository, add the following lines aft
 
  set :repository, File.expand_path("../../.git", __FILE__)
  set :deploy_via, :copy
+ 
+If you need to link additional folders from public to shared do you can do the following:
 
+ set :shared_children,   %w(system log pids config photos)
+
+ namespace :deploy do
+  after  "deploy:symlink", :link_shared_paths
+ end
+
+ task :link_shared_paths do 
+  run <<-CMD
+   cd #{release_path} &&
+   ln -s #{shared_path}/photos #{release_path}/public/photo
+ CMD
+
+ end
+ 
 == License
 
 Please see MIT-LICENSE for more details.
