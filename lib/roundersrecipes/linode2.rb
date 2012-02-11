@@ -49,7 +49,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   #
   # Recipes
   #
-  after 'deploy:update', 'deploy:symlink_shared'
+  before 'deploy:finalize_update', 'deploy:symlink_shared'
   
   namespace :deploy do
     
