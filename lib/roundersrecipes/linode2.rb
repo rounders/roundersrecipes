@@ -49,7 +49,6 @@ Capistrano::Configuration.instance(:must_exist).load do
   #
   # Recipes
   #
-  
   after 'deploy:update', 'deploy:symlink_shared'
   
   namespace :deploy do
@@ -119,7 +118,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     
     desc "symlink database.yml file"
     task :symlink_shared, :roles => :web do
-      run "ln -nfs #{shared_path}/config/database.yml #{current_path}/config/database.yml"
+      run "ln -nfs #{shared_path}/config/database.yml #{latest_release}/config/database.yml"
     end
 
     desc "rake db:create"
