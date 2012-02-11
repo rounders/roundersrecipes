@@ -21,6 +21,7 @@ Start by capifying your project as follows
     $ capify .
 
 Then edit config/deploy.rb and make it look as follows:
+ load 'deploy/assets' 
  require "bundler/capistrano"
 
  set :application, "your_application_name"
