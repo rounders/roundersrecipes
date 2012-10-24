@@ -28,7 +28,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set(:repository)      { "git@github.com:rounders/#{application}.git"}
   _cset :branch,        'master'
   _cset :deploy_via,    'remote_cache'
-  set :shared_children,   %w(system log pids config)
+  set :shared_children,   %w(public/system log tmp/pids config/config)
   
   set :repository_cache, "git_cache"
   set :deploy_via, :remote_cache
