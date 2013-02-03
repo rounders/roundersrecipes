@@ -84,7 +84,7 @@ Capistrano::Configuration.instance(:must_exist).load do
       write_database_yaml
       write_nginx_config
     end
-
+    
     desc "write out nginx virtual host configuration for this app"
     task :write_nginx_config, :roles => :web do
       template_path = File.expand_path('../../../templates/nginx.erb', __FILE__)
@@ -133,9 +133,10 @@ Capistrano::Configuration.instance(:must_exist).load do
     desc "cold deploy"
     task :cold do
       update
-      dbcreate
       migrate      
     end
+    
+    before "deploy:assets:precompile", "deploy:dbcreate"
     
     desc "remove all application files"
     task :remove_files, :except => { :no_release => true } do
