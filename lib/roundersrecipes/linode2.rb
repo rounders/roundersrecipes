@@ -28,7 +28,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set(:repository)      { "git@github.com:rounders/#{application}.git"}
   _cset :branch,        'master'
   _cset :deploy_via,    'remote_cache'
-  set :shared_children,   %w(public/system log tmp/pids config/config)
+  set :shared_children,   %w(public/system log tmp/pids)
   
   set :repository_cache, "git_cache"
   set :deploy_via, :remote_cache
@@ -79,12 +79,8 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :restart, :roles => :app, :except => { :no_release => true } do
       run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
     end
-
-    task :setup, :except => { :no_release => true } do
-      dirs = [deploy_to, releases_path, shared_path]
-      dirs += shared_children.map { |d| File.join(shared_path, d) }
-      run "sudo mkdir -p #{dirs.join(' ')} && sudo chmod g+w #{dirs.join(' ')} && sudo chown #{user}: #{dirs.join(' ')}"
-
+    
+    after "deploy:setup" do
       write_database_yaml
       write_nginx_config
     end
@@ -110,10 +106,13 @@ Capistrano::Configuration.instance(:must_exist).load do
     
     desc "write database.yml file"
     task :write_database_yaml, :roles => :web do
+      shared_config_path = File.join(shared_path, "config")
+      run "#{try_sudo} mkdir -p #{shared_config_path}"
+      
       template_path = File.expand_path('../../../templates/database_yml.erb', __FILE__)
       template = open(template_path) { |f| f.read }
       page = ERB.new(template).result(binding)
-      put page, "#{shared_path}/config/database.yml", :mode => 0644
+      put page, "#{shared_config_path}/database.yml", :mode => 0644
     end
     
     desc "symlink database.yml file"
