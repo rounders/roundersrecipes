@@ -3,11 +3,11 @@
 Capistrano recipes to make it easier for me to deploy to one of my linode servers.  By default it assumes the project can be found in my github account. 
 
 
-== Installation
+== Installation for Projects using capistrano >= 2.5.0, <= 2.9.0
 
 Open up your Gemfile and add at the bottom this line:
  group :development do
-    gem "roundersrecipes", :git => "git@github.com:rounders/roundersrecipes.git", :require => false
+    gem "roundersrecipes", :git => "git@github.com:rounders/roundersrecipes.git", :tag => "v0.1.0", :require => false
  end
 
 Now, run:
