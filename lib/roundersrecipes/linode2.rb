@@ -78,7 +78,9 @@ Capistrano::Configuration.instance(:must_exist).load do
     task :stop do ; end
     task :restart, :roles => :app, :except => { :no_release => true } do
       run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
-    end
+    end   
+    
+    after "deploy:restart", "deploy:cleanup"
 
     task :setup, :except => { :no_release => true } do
       dirs = [deploy_to, releases_path, shared_path]
