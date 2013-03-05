@@ -19,7 +19,7 @@ Capistrano::Configuration.instance(:must_exist).load do
   set(:url)     { "#{application}.roundersdev.com" }
   _cset(:runner)        { user }
   _cset :use_sudo,      false
-  set :nginx_config_path, "/etc/nginx/conf/sites-available"
+  set :nginx_config_path, "/etc/nginx/sites-available"
 
   # SCM settings
 
@@ -83,6 +83,7 @@ Capistrano::Configuration.instance(:must_exist).load do
     after "deploy:setup" do
       write_database_yaml
       write_nginx_config
+      enable_site
     end
 
     desc "write out nginx virtual host configuration for this app"
@@ -92,16 +93,29 @@ Capistrano::Configuration.instance(:must_exist).load do
       page = ERB.new(template).result(binding)
 
       put page, "#{shared_path}/#{url}", :mode => 0644
-      run "sudo cp #{shared_path}/#{url} #{nginx_config_path}"
-      run "cd #{nginx_config_path}/../sites-enabled;sudo ln -s ../sites-available/#{url}"
-      run "sudo /etc/init.d/nginx restart"
+      sudo "cp #{shared_path}/#{url} #{nginx_config_path}"
+    end
+
+    desc "enable site"
+    task :enable_site, :roles => :web do
+      sudo "/usr/sbin/nxensite #{url}"
+      restart_nginx
+    end
+
+    desc "disable site"
+    task :disable_site, :roles => :web do
+      sudo "/usr/sbin/nxdissite #{url}"
+      restart_nginx
+    end
+
+    desc "restart nginx"
+    task :restart_nginx, :roles => :web do
+      sudo "/etc/init.d/nginx restart"
     end
 
     desc "remove nginx virtual host configuration for this app"
     task :remove_nginx_config, :roles => :web do
-      run "sudo cp #{shared_path}/#{url} #{nginx_config_path}"
-      run "cd #{nginx_config_path};sudo rm ../sites-enabled/#{url};sudo rm ./#{url}"
-      run "sudo /etc/init.d/nginx restart"
+      sudo "rm #{nginx_config_path}/#{url}"
     end
 
     desc "write database.yml file"
