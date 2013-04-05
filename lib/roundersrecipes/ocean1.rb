@@ -86,6 +86,8 @@ Capistrano::Configuration.instance(:must_exist).load do
       enable_site
     end
 
+    after "deploy:restart", "deploy:cleanup"
+
     desc "write out nginx virtual host configuration for this app"
     task :write_nginx_config, :roles => :web do
       template_path = File.expand_path('../../../templates/nginx.erb', __FILE__)
